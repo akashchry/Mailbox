@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mailbox Register</title>
+
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+
+        .container{
+            width: 450px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        h2{
+            text-align: center;
+            color: #333;
+        }
+
+        input{
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button{
+            width: 100%;
+            padding: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover{
+            background: #218838;
+        }
+
+        p{
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        a{
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .errorlist{
+            color: red;
+            list-style: none;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Create Account</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">
+            Register
+        </button>
+
+    </form>
+
+    <p>
+        Already have an account?
+        <a href="{% url 'login' %}">
+            Login
+        </a>
+    </p>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mailbox - Bulk Email Sender</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, sans-serif;
+        }
+
+        body{
+            background:#f4f6f9;
+        }
+
+        .navbar{
+            background:#007bff;
+            color:white;
+            padding:15px 30px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .navbar a{
+            color:white;
+            text-decoration:none;
+            margin-left:15px;
+            font-weight:bold;
+        }
+
+        .container{
+            width:600px;
+            margin:40px auto;
+            background:white;
+            padding:30px;
+            border-radius:10px;
+            box-shadow:0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2{
+            text-align:center;
+            margin-bottom:25px;
+            color:#333;
+        }
+
+        label{
+            font-weight:bold;
+            display:block;
+            margin-top:15px;
+            margin-bottom:5px;
+        }
+
+        input,
+        select{
+            width:100%;
+            padding:10px;
+            border:1px solid #ccc;
+            border-radius:5px;
+        }
+
+        button{
+            width:100%;
+            padding:12px;
+            margin-top:20px;
+            background:#007bff;
+            color:white;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+            font-size:16px;
+        }
+
+        button:hover{
+            background:#0056b3;
+        }
+
+        #result{
+            margin-top:20px;
+            text-align:center;
+            font-weight:bold;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+
+    <h3>📧 Mailbox</h3>
+
+    <div>
+        <a href="{% url 'history' %}">
+            Email History
+        </a>
+
+        <a href="{% url 'logout' %}">
+            Logout
+        </a>
+    </div>
+
+</div>
+
+<div class="container">
+
+    <h2>Bulk Email Sender</h2>
+
+    <form id="mailForm">
+    {% csrf_token %}
+
+        <label>
+            Upload Excel/CSV File
+        </label>
+
+        <input
+            type="file"
+            id="file"
+            required
+        >
+
+        <label>
+            Attachment (Optional)
+        </label>
+
+        <input
+            type="file"
+            id="attachment"
+        >
+
+        <label>
+            Send Type
+        </label>
+
+        <select id="send_type">
+
+            <option value="individual">
+                Individual
+            </option>
+
+            <option value="bulk">
+                Bulk
+            </option>
+
+        </select>
+
+        <button type="submit">
+            Send Emails
+        </button>
+
+    </form>
+
+    <div id="result"></div>
+
+</div>
+
+<script>
+
+function getCookie(name) {
+
+    let cookieValue = null;
+
+    if (document.cookie && document.cookie !== '') {
+
+        const cookies = document.cookie.split(';');
+
+        for (let i = 0; i < cookies.length; i++) {
+
+            const cookie = cookies[i].trim();
+
+            if (
+                cookie.substring(0, name.length + 1)
+                === (name + '=')
+            ) {
+
+                cookieValue = decodeURIComponent(
+                    cookie.substring(
+                        name.length + 1
+                    )
+                );
+
+                break;
+            }
+        }
+    }
+
+    return cookieValue;
+}
+
+document.getElementById(
+    "mailForm"
+).addEventListener(
+    "submit",
+    async function(e){
+
+        e.preventDefault();
+
+        let file =
+            document.getElementById(
+                "file"
+            ).files[0];
+
+        let attachment =
+            document.getElementById(
+                "attachment"
+            ).files[0];
+
+        let send_type =
+            document.getElementById(
+                "send_type"
+            ).value;
+
+        let formData =
+            new FormData();
+
+        formData.append(
+            "file",
+            file
+        );
+
+        formData.append(
+            "send_type",
+            send_type
+        );
+
+        if(attachment){
+
+            formData.append(
+                "attachment",
+                attachment
+            );
+
+        }
+
+        document.getElementById(
+            "result"
+        ).innerHTML =
+        "Sending emails...";
+
+        try{
+
+            let response =
+                await fetch(
+                    "/send-mail/",
+                    {
+                        method:"POST",
+
+                        headers:{
+                            "X-CSRFToken":
+                            getCookie("csrftoken")
+                        },
+
+                        body:formData
+                    }
+                );
+
+            let data =
+                await response.json();
+
+            console.log(data);
+
+            document.getElementById(
+                "result"
+            ).innerHTML =
+            data.message ||
+            data.error ||
+            JSON.stringify(data);
+
+        }
+
+        catch(error){
+
+            console.log(error);
+
+            document.getElementById(
+                "result"
+            ).innerHTML =
+            "Something went wrong.";
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
